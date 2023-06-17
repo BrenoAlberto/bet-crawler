@@ -23,5 +23,3 @@ scrapy crawl estrelabet_cruzeiro
 - `/estrelabet/spiders/estrelabet_cruzeiro.py`
 
 - `/estrelabet/settings.py`
-
-- `/estrelabet/utils.py`
