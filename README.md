@@ -17,3 +17,11 @@ pip install -r requirements.txt
 ```bash
 scrapy crawl estrelabet_cruzeiro
 ```
+
+## Key Parts of the Code
+
+- `/estrelabet/spiders/estrelabet_cruzeiro.py`
+
+- `/estrelabet/settings.py`
+
+- `/estrelabet/utils.py`
