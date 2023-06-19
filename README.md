@@ -4,18 +4,12 @@ This is a simple scrapper to get the next game of Cruzeiro Esporte Clube.
 
 ## Requirements
 
-- Python 3.8 or higher
-
-## Installation
-
-```bash
-pip install -r requirements.txt
-```
+- Docker
 
 ## Running
 
 ```bash
-scrapy crawl estrelabet_cruzeiro
+docker compose build && docker compose up
 ```
 
 ## Key Parts of the Code

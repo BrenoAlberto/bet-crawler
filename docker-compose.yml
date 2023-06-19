@@ -1,0 +1,18 @@
+version: "3"
+services:
+  splash:
+    image: scrapinghub/splash
+    ports:
+      - "8050:8050"
+    logging:
+      driver: none
+
+  scraper:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      SPLASH_URL: "http://splash:8050"
+    command: ["scrapy", "crawl", "estrelabet_cruzeiro"]
+    depends_on:
+      - splash

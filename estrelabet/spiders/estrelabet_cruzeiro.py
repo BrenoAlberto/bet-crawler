@@ -3,43 +3,55 @@ import json
 from datetime import datetime
 from scrapy_splash import SplashRequest
 
-
 class EstrelabetCruzeiroSpider(scrapy.Spider):
     name = "estrelabet_cruzeiro"
     allowed_domains = ["wwww.estrelabet.com", "estrelabet.com"]
-    start_urls = [
-        "https://estrelabet.com/api-v2/name-search/d/23/estrelabet/cruzeiro"]
     ODDS_HEADERS = ["Resultado", "Ambas equipes marcam"]
 
     script = """
-    function main(splash, args)
-    	splash:set_user_agent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36")
-
-        assert(splash:go(args.url))
-        assert(splash:wait(0.5))
-        return {
-            cookies = splash:get_cookies()
-        }
+        function main(splash, args)
+            splash:set_user_agent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36')
+            splash:on_request(function(request)
+                request:set_header('sec-ch-ua', '"Chromium";v="110", "Not A(Brand";v="24", "Google Chrome";v="110"')
+                request:set_header('sec-ch-ua-mobile', '?0')
+                request:set_header('sec-fetch-dest', 'document')
+                request:set_header('sec-fetch-mode', 'navigate')
+                request:set_header('sec-fetch-site', 'same-origin')
+                request:set_header('sec-fetch-user', '?1')
+                request:set_header('upgrade-insecure-requests', '1')
+            end)
+            assert(splash:go(args.url))
+            assert(splash:wait(0.5))
+            assert(splash:go('https://estrelabet.com/ptb/bet/search/Cruzeiro'))
+            assert(splash:wait(0.5))
+            return splash:get_cookies()
         end
-    """
+        """
 
     def start_requests(self):
         yield SplashRequest(
-            url="https://www.estrelabet.com/",
+            url="https://estrelabet.com/ptb/bet/main",
             callback=self.get_game_data,
             endpoint="execute",
             args={"lua_source": self.script}
         )
 
+
     def get_game_data(self, response):
-        print(response.request.headers.getlist('Set-Cookie'))
-        print(response.cookiejar)
         yield scrapy.Request(
             method="POST",
-            url=self.start_urls[0],
+            url="https://estrelabet.com/api-v2/name-search/d/23/estrelabet/cruzeiro",
             callback=self.parse,
             headers={
-                "Bragiurl": "https://bragi.sportingtech.com/"
+                "bragiurl": "https://bragi.sportingtech.com/",
+                "sec-ch-ua": '"Chromium";v="110", "Not A(Brand";v="24", "Google Chrome";v="110"',
+                "sec-ch-ua-mobile": "?0",
+                "sec-fetch-dest": "empty",
+                "sec-fetch-mode": "cors",
+                "sec-fetch-site": "same-origin",
+                "referer": "https://estrelabet.com/ptb/bet/main",
+                "origin": "https://estrelabet.com",
+                "content-type": "application/json",
             },
             body=json.dumps({
                 "requestBody": {
@@ -52,10 +64,6 @@ class EstrelabetCruzeiroSpider(scrapy.Spider):
         )
 
     def parse(self, response):
-        # with open("initial_response.json", "wb") as f:
-        #     f.write(response.body)
-        print(response.headers)
-
         search_response = json.loads(response.body)
         games_data = self.filter_and_process_relevant_data(search_response)
         next_game = self.get_next_game(games_data)
