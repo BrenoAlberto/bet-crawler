@@ -12,6 +12,11 @@ class EstrelabetCruzeiroSpider(scrapy.Spider):
         function main(splash, args)
             splash:set_user_agent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36')
             splash:on_request(function(request)
+                if request.rul:find('css') then
+                    request.abort()
+                end
+                splash.images_enabled = false
+                splash.js_enabled = false
                 request:set_header('sec-ch-ua', '"Chromium";v="110", "Not A(Brand";v="24", "Google Chrome";v="110"')
                 request:set_header('sec-ch-ua-mobile', '?0')
                 request:set_header('sec-fetch-dest', 'document')
