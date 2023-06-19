@@ -9,7 +9,8 @@ This is a simple scrapper to get the next game of Cruzeiro Esporte Clube.
 ## Running
 
 ```bash
-docker compose build && docker compose up --no-attach splash
+docker compose build
+docker compose up --no-attach splash
 ```
 
 ## Key Parts of the Code
